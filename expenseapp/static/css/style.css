@@ -1,0 +1,90 @@
+.top-bar {
+  margin-left: -16px;
+  background-color: rgb(61, 84, 103);
+  color: white;
+}
+
+.sidebar-wrapper {
+  background-color: rgb(21, 32, 43) !important;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-container-items {
+  padding: 0% 5%;
+}
+.logout-link {
+  font-size: 17px !important;
+  padding: 10px !important;
+  color: white !important;
+  text-decoration: none !important;
+  background: none !important;
+  color: white !important;
+  border: none;
+}
+
+.logout-link :hover {
+  font-size: 17px !important;
+  padding: 10px !important;
+  text-decoration: none !important;
+  background-color: rgb(21, 32, 43);
+  color: rgb(29, 161, 243) !important;
+  border: none;
+}
+
+.sidebar-container-items a {
+  font-size: 17px;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  background: none;
+  color: white;
+  border: none;
+}
+.sidebar-container-items a:hover {
+  background-color: rgb(21, 32, 43);
+  color: rgb(29, 161, 243);
+}
+.sidebar-container-items a:active {
+  background-color: rgb(21, 32, 43);
+  color: rgb(29, 161, 243);
+}
+
+.fa-house-damage {
+  align-self: center;
+  text-align: center;
+  margin-left: 35%;
+}
+.icon::after {
+  width: 100px;
+}
+.main-auth-wrapper {
+  background-color: rgb(21, 32, 43);
+}
+.login-section {
+  margin-top: 10%;
+}
+
+.app-auth {
+  display: none !important;
+}
+
+@media (max-width: 765px) {
+  .mobile-links {
+    display: flex !important;
+    flex-wrap: wrap;
+  }
+}
+.mobile-up {
+  color: white;
+  padding: 5px 15px;
+  font-size: 15px;
+}
+
+@media (max-width: 500px) {
+  main {
+    padding-top: 150px !important;
+  }
+}
