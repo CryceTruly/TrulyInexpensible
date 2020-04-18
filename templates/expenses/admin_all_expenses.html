@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %} | Dashboard {% endblock %}
+{% load static %}
+{% block content %}
+
+{% load humanize %}
+
+<!-- Alerts -->
+
+<section id="dashboard" class="py-4">
+  <div class="container">
+
+<div class="row">
+<div class="col-md-12">
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Expenses</a></li>
+    <li class="breadcrumb-item active" aria-current="page">All Expenses</li>
+  </ol>
+</nav>
+</div>
+
+<div class="col-md-2">
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New Expense</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form action="{%url 'expenses_add'%}" method="POST" autocomplete="off">
+              {% csrf_token%}
+          <div class="form-group">
+            <label for="amount" class="col-form-label">Amount (RWF):</label>
+            <input type="number" name="amount" class="form-control" id="amount" required>
+          </div>
+          <div class="form-group">
+            <label for="purpose"  class="col-form-label">Purpose:</label>
+            <textarea class="form-control" name="purpose" id="purpose" required></textarea>
+          </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <input type="submit" class="btn btn-primary" value="Submit">
+      </div>
+        </form>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+
+
+
+{% include 'partials/_alerts.html'%}
+{% if not expenses.count %}
+<div class="my-1 p-5">
+<h3>No Expenses </h3>
+<a href="{% url 'expenses_add' %}">Add One</a>
+</div>
+
+{% else %}
+ <form class="form-inline my-2 my-lg-0 float-right p-2">
+      <input class="form-control mr-sm-2" type="search" id="search"  placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0 search-btn" type="submit">Search</button>
+    </form>
+
+
+     <div class="search-output-area table-responsive">
+     <table class="table table-hover table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">  Requester</th>
+      <th scope="col">Amount (RWF)</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Date</th>
+      <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody class="result-rows">
+
+        </tbody>
+      </table>
+</div>
+
+
+    <div class='table-area table-responsive'>
+<table class="table table-hover table-striped table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Requester</th>
+      <th scope="col">Amount (RWF)</th>
+      <th scope="col">Purpose</th>
+
+      <th scope="col">Date</th>
+       <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for ex in page_obj%}
+
+    <tr class="text-sm-left small">
+      <td>{{ex.requester}}</td>
+      <td>{{ex.amount}}</td>
+      <td>{{ex.purpose}}</td>
+
+
+      <td>{{ex.requested_on | naturaltime}}</td>
+
+      {% if ex.status == 'PENDING' %}
+            <td><button class="btn btn-sm">{{ex.status}}</btn></td>
+      {% endif %}
+
+
+      {% if ex.status == 'APPROVED' %}
+            <td><button class="btn btn-sm btn-outline-info disabled">{{ex.status}}<i class="fa fa-check-double"></btn></td>
+      {% endif %}
+    </tr>
+{% endfor %}
+
+  </tbody>
+</table>
+<div>
+
+<div class="container container-pagination">
+<span class="current">
+       Showing     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+<ul class="pagination align-right float-right mr-auto">
+        {% if page_obj.has_previous %}
+            <li {% if page_obj.number == 1 %}  class="page-item active" {% endif %}><a  class="page-link" href="?page=1">&laquo; 1</a></li>
+           <li class="page-item">  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">   <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+           <li class="page-item">    <a   class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages}} &raquo;</a></li>
+        {% endif %}
+
+
+</ul>
+
+</div>
+
+
+{% endif %}
+  </div>
+  </div>
+
+</section>
+
+<script src={% static 'js/expenses.js' %}>
+
+</script>
+
+{%endblock content%}

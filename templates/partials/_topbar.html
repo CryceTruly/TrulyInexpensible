@@ -1,0 +1,16 @@
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">expenseapp</a>
+       <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+        <a> <span class="pr-3">{{ request.user.email }}</span>
+            <small class="pr-3  text-sm text-monospace">({{ request.user.email }})</small></a>
+          <a>
+           <form action="{% url 'logout' %}" method="POST" style="display:inline">
+            {% csrf_token %}
+           <i class="fas icon fa-sign-out-alt"></i>
+            <input type="submit" class="logout-link" value='Logout' href="{% url 'login' %}">
+            </form>
+            </a>
+        </li>
+      </ul>
+    </nav>

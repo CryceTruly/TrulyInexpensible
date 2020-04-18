@@ -1,0 +1,39 @@
+{% extends 'base_auth.html' %} {% load static%} {%block title%} | Login to Account
+{%endblock%} {%block content%}
+<section id="login" class="login-section">
+  <div class="container">
+    <div class="row">
+     <div class="col-md-6 mx-auto">
+     <div class="mb-3 welcome" style="color:white">
+       <h3>Welcome Back</h3>
+     </div>
+
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4><i class="fas fa-sign-in-alt"></i> Login</h4>
+          </div>
+          <div class="card-body">
+            {% include 'partials/_alerts.html'%}
+            <form action="{%url 'login'%}" method="POST" autocomplete="off">
+              {% csrf_token%}
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" required value="{{ values.username }}" />
+              </div>
+
+              <div class="form-group">
+                <label for="password2">Password</label>
+                <input type="password" name="password" class="form-control" required />
+              </div>
+              <input type="submit" value="Login" class="btn btn-secondary btn-block" />
+            </form>
+            <div class='register-link'>Need a new Account <span> <a href="{% url 'register'%}">
+            Register</a></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{%endblock%}

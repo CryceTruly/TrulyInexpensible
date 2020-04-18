@@ -1,0 +1,117 @@
+<div class="row mt-5">
+<div class="col-md-6">
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Expense Categories</h5>
+    <h6 class="card-subtitle mb-2 text-muted">Distribution per category (Last 3 months)</h6>
+<canvas id="myChart" width="50" height="50"></canvas>
+  </div>
+</div>
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Online Services', 'Entertainment', 'Restaurants', 'Rent', 'Insurance', 'Family','Travel','Business Miscellaneous','Gasoline Fuel','Others'],
+        datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            backgroundColor: [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 206, 86)',
+                'rgb(75, 192, 192)',
+                'rgb(153, 102, 255)',
+                'rgb(255, 159, 64)'
+
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 206, 86, 1)',
+                'rgb(75, 192, 192, 1)',
+                'rgb(153, 102, 255, 1)',
+                'rgb(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+</div><div class="col-md-6">
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Cumulative Comparison</h5>
+    <h6 class="card-subtitle mb-2 text-muted">Past 3 months Expenses</h6>
+<canvas id="speedChart" width="50" height="50"></canvas>
+  </div>
+	<script>
+var monthCumulative = document.getElementById("speedChart");
+
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 18;
+
+var dataFirst = {
+    label: "February 2020",
+    data: [2000, 5009, 7005, 200, 20001, 550, 400],
+    lineTension: 0,
+    fill: false,
+    borderColor: 'rgb(80,151,215)'
+  };
+
+var dataSecond = {
+    label: "March 2020",
+    data: [20000, 15, 30000, 60, 65, 30, 10000],
+    lineTension: 0,
+    fill: false,
+  borderColor:  'rgb(231,109, 132)',
+  };
+
+  var thirdSecond = {
+    label: "April 2020",
+    data: [10000, 2000, 3000, 10000, 37000, 30800, 3700],
+    lineTension: 0,
+    fill: false,
+  borderColor:  '#18bc9c ',
+  };
+
+var speedData = {
+  labels: ['01','08','15','22','29'],
+  datasets: [dataFirst, dataSecond,thirdSecond]
+};
+
+
+
+
+var chartOptions = {
+  legend: {
+    display: true,
+    position: 'top',
+    labels: {
+      boxWidth: 10,
+      fontSize:10,
+    }
+  }
+};
+
+var lineChart = new Chart(monthCumulative, {
+  type: 'line',
+  data: speedData,
+  options: chartOptions
+});
+
+	</script>
+</div>
+
+</div>
