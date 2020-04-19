@@ -1,12 +1,10 @@
 
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Truly InExpense</a>
-       <ul class="navbar-nav px-3">
+    <nav class="navbar navbar-light fixed-top  bg-light  flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">TIE MONEY</a>
+       <ul class="navbar-nav px-3 ">
         <li class="nav-item text-nowrap">
 
 <span class="mobile-links" style="display:none">
-
-
             <a  type="submit" class="mobile-up" href="{% url 'income' %}">My income
             </a>
              <a>
@@ -33,13 +31,13 @@
 </span>
 
 
-            <a> <span class="pr-3">{{ request.user.email }}</span>
+            <a> <span class="pr-3">{{ request.user.username }}</span>
             <small class="pr-3  text-sm text-monospace">({{ request.user.email }})</small></a>
              <a>
            <form action="{% url 'logout' %}" method="POST" style="display:inline">
             {% csrf_token %}
            <i class="fas icon fa-sign-out-alt"></i>
-            <input type="submit" class="logout-link" value='Logout' href="{% url 'login' %}">
+            <input type="submit" class="" value='Logout' href="{% url 'login' %}">
             </form>
             </a>
         </li>
@@ -48,7 +46,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <nav class="col-md-2 d-none d-md-block sidebar  bg-light">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -58,14 +56,14 @@
               </a>
             </h6>
 
-                <li class="nav-item">
+                <li class="nav-item" >
 
-               <a href="{% url 'income' %}" class="nav-link"><i class="fa fa-file"></i>   My income</a>
+               <a href="{% url 'income' %}" class="nav-link  text-dark"><i class="fa fa-file"></i>   My income</a>
 
               </li>
                <li class="nav-item">
 
-                 <a href="{% url 'expenses' %}" class="nav-link">    <i class="fa fa-money-bill"></i>  My Expenses</a>
+                 <a href="{% url 'expenses' %}" class="nav-link  text-dark">    <i class="fa fa-money-bill"></i>  My Expenses</a>
 
               </li>
 
@@ -83,13 +81,13 @@
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'expenses-summary' %}" >
+                <a class="nav-link  text-dark" href="{% url 'expenses-summary' %}" >
                   <i class="fa fa-chart-line"></i>
                   Expenses Summary
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'income-summary' %}">
+                <a class="nav-link  text-dark" href="{% url 'income-summary' %}">
                   <i class="fa fa-chart-line"></i>
                   Income Summary
                 </a>

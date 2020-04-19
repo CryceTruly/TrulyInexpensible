@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} | Expense Summary {% endblock %}
+{% block title %} | Income Summary {% endblock %}
 {% load static %}
 {% block content %}
 {% load humanize %}
@@ -12,7 +12,7 @@
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'expenses' %}">All Expenses</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'income' %}">All Income</a></li>
     <li class="breadcrumb-item active" aria-current="page">Summary</li>
   </ol>
 </nav>

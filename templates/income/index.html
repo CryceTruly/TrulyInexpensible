@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %} | Incomes {% endblock %}
+{% load static %}
+{% block content %}
+
+<!-- Alerts -->
+
+<section id="dashboard" class="py-4">
+  <div class="container">
+
+
+
+<div class="row">
+<div class="col-md-10">
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'income' %}">Incomes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">My Income</li>
+  </ol>
+</nav>
+</div>
+
+<div class="col-md-2">
+<a type="button" href="{% url 'income_add'%}" class="btn btn-outline-success" >New Record</a>
+  </div>
+</div>
+</div>
+
+
+
+
+{% include 'partials/_alerts.html'%}
+{% if not income.count %}
+<div class="my-1 p-5">
+<h3>No Records yet </h3>
+<a href="{% url 'income_add' %}">Submit your first</a>
+</div>
+
+{% else %}
+ <form class="form-inline my-2 my-lg-0 float-right p-2">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search"  id="search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0 search-btn" type="submit">Search</button>
+    </form>
+         <div class="search-output-area table-responsive">
+     <table class="table table-hover table-striped table-sm">
+        <thead>
+          <tr>
+      <th scope="col">Amount</th>
+      <th scope="col">Source</th>
+          <th scope="col">Description</th>
+      <th scope="col">Date</th>
+      <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody class="result-rows">
+        </tbody>
+      </table>
+</div>
+
+    <div class='table-area table-responsive'>
+<table class="table table-hover table-striped table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Amount</th>
+        <th scope="col">Source</th>
+      <th scope="col">Description</th>
+       <th scope="col">Date</th>
+        <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{% for ex in page_obj%}
+
+     <tr class="text-sm-left small">
+      <td>{{ex.amount}}</td>
+       <td>{{ex.source }}</td>
+      <td>{{ex.description}}</td>
+      <td>{{ex.date|date:'d/m/Y' }}</td>
+<td>
+ <a type="button" class="btn btn-outline-success btn-sm"  href={%  url 'income_edit' ex.id %}>Edit</a>
+ <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#exampleModal">X</button>
+
+ <div class="modal" tabindex="-1" role="dialog" id="exampleModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Action!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this Record?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">CLOSE</button>
+        <a type="button" class="btn btn-primary"  href={%  url 'income_delete' ex.id %}>YES</a>
+      </div>
+    </div>
+  </div>
+</div>
+</td>
+
+
+
+    </tr>
+
+
+{% endfor %}
+
+  </tbody>
+</table>
+</div>
+
+
+<div class="container container-pagination">
+<span class="current">
+       Showing     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+<ul class="pagination align-right float-right mr-auto">
+        {% if page_obj.has_previous %}
+            <li {% if page_obj.number == 1 %}  class="page-item active" {% endif %}><a  class="page-link" href="?page=1">&laquo; 1</a></li>
+           <li class="page-item">  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">   <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+           <li class="page-item">    <a   class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages}} &raquo;</a></li>
+        {% endif %}
+
+
+</ul>
+
+</div>
+
+
+{% include 'partials/_main_charts.html' %}
+
+
+{% endif %}
+  </div>
+  </div>
+
+</section>
+<script src={% static 'js/userincome.js' %}>
+
+</script>
+
+
+{%endblock%}

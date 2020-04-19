@@ -26,13 +26,12 @@ class EmailThread(threading.Thread):
                   recipient_list=[self.recipient_list])
 
 
-def register(request):
-    if request.method == 'POST':
+class RegistrationView(View):
+    def post(self, request):
         # Get form values
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-
         # Check username
         if User.objects.filter(username=username).exists():
             messages.error(request, 'That username is taken')
@@ -42,24 +41,19 @@ def register(request):
                 messages.error(request, 'That email is being used')
                 return redirect('register')
             else:
-                # Looks good
                 user = User.objects.create_user(
                     username=username, password=password, email=email)
-                # Login after register
-                # auth.login(request, user)
-                # messages.success(request, 'You are now logged in')
-                # return redirect('index')
                 user.save()
                 messages.success(
                     request, 'You are now registered and can log in')
                 return redirect('login')
 
-    else:
+    def get(self, request):
         return render(request, 'authentication/register.html')
 
 
-def login(request):
-    if request.method == 'POST':
+class LoginView(View):
+    def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
         user = auth.authenticate(username=username, password=password)
@@ -70,7 +64,8 @@ def login(request):
         else:
             messages.error(request, 'Invalid credentials')
             return redirect('login')
-    else:
+
+    def get(self, request):
         return render(request, 'authentication/login.html')
 
 
@@ -95,8 +90,8 @@ class ProfileView(View):
         return render(request, 'authentication/profile.html')
 
 
-def logout(request):
-    if request.method == 'POST':
+class LogoutView(View):
+    def post(self, request):
         auth.logout(request)
         messages.success(request, 'You are now logged out')
         return redirect('login')

@@ -41,7 +41,7 @@ def expenses(request):
 @login_required(login_url='/authentication/login')
 def expenses_add(request):
     data = []
-    file = os.path.dirname(__file__)
+    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(file, 'currencies.json')
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
@@ -89,7 +89,7 @@ def expense_edit(request, id):
     data = []
     arr = []
 
-    file = os.path.dirname(__file__)
+    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(file, 'currencies.json')
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
