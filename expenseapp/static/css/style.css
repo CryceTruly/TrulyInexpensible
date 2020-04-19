@@ -88,3 +88,9 @@
     padding-top: 150px !important;
   }
 }
+
+.toggle-show {
+  position: absolute;
+  right: 10%;
+  margin-top: 2px;
+}
