@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} | New Expense {% endblock %}
+{% block title %} | New Income {% endblock %}
 {% block content %}
 
 <!-- Alerts -->
@@ -8,16 +8,16 @@
   <div class="container">
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'expenses' %}">Expenses</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Add Expense</li>
+    <li class="breadcrumb-item"><a href="{% url 'income' %}">Income</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Income</li>
   </ol>
 </nav>
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Expense</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Income</h5>
       </div>
       <div class="modal-body">
-            <form action="{%url 'expenses_add'%}" method="POST" autocomplete="off">
+            <form action="{%url 'income_add'%}" method="POST" autocomplete="off">
               {% csrf_token%}
 {% include 'partials/_alerts.html'%}
           <div class="form-group">
@@ -33,22 +33,21 @@
                   </select>
            </div>
                 <div class="form-group">
-                  <label for="category">Category</label>
-                  <select name="category" class="form-control" id="category">
-          {% for category in  categories%}
-           <option name="category" value={{category.name}}>{{category.name}}</option>
+                  <label for="source">Source</label>
+                  <select name="source" class="form-control" id="source">
+          {% for source in  sources%}
+           <option name="source">{{source.name}}</option>
           {% endfor %}
                   </select>
            </div>
           <div class="form-group">
-            <label for="name"  class="col-form-label">Description:</label>
-            <textarea class="form-control" name="name" id="name"></textarea>
+            <label for="description"  class="col-form-label">Description:</label>
+            <textarea class="form-control" name="description" id="description"></textarea>
           </div>
             <div class="form-group">
-            <label for="date"  class="col-form-label">Date of Expense:</label>
+            <label for="date"  class="col-form-label">Date of Income:</label>
             <input type="date" class="form-control" name="date" id="date"></input>
           </div>
-
         <input type="submit" class="btn btn-primary" value="Submit">
       </div>
 

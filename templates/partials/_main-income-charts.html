@@ -2,14 +2,16 @@
 <div class="col-md-6">
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title">Expense Categories</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Distribution per category (Last 3 months)</h6>
+    <h5 class="card-title">Income Sources</h5>
+    <h6 class="card-subtitle mb-2 text-muted">Distribution per source (Last 3 months)</h6>
 <canvas id="myChart" width="50" height="50"></canvas>
   </div>
 </div>
 <script>
+
 const showChart=(data)=>{
-const [values,labels] = [Object.values(data.category_data).map(item=>item.amount),Object.keys(data.category_data)]
+  console.log(data)
+const [values,labels] = [Object.values(data.sources_data).map(item=>item.amount),Object.keys(data.sources_data)]
 var ctx = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'bar',
@@ -34,7 +36,7 @@ var myChart = new Chart(ctx, {
                 'rgba(153, 102, 255, 1)',
                 'rgba(255, 159, 64, 1)'
             ],
-            borderWidth: 1
+            borderWidth: 0.5
         }]
     },
     options: {
@@ -49,8 +51,8 @@ var myChart = new Chart(ctx, {
 });
 }
 
-const getCategoryData=()=>{
-fetch('/expenses/three_months_summary').then(res=>res.json()).
+const getSourcesData=()=>{
+fetch('/income/three_months_summary').then(res=>res.json()).
 then(data=>
 {
   showChart(data);
@@ -58,7 +60,7 @@ then(data=>
 )
 }
 
-window.addEventListener('load',getCategoryData)
+window.addEventListener('load',getSourcesData)
 
 
 
@@ -71,7 +73,7 @@ window.addEventListener('load',getCategoryData)
 <div class="card">
   <div class="card-body">
     <h5 class="card-title">Cumulative Comparison</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Past 3 months Expenses</h6>
+    <h6 class="card-subtitle mb-2 text-muted">Past 3 months Income</h6>
 <canvas id="speedChart" width="50" height="50"></canvas>
   </div>
 	<script>
@@ -82,7 +84,7 @@ Chart.defaults.global.defaultFontSize = 18;
 
 var dataFirst = {
     label: "February 2020",
-    data: [2000, 5009, 7005, 200, 20001, 550, 400],
+    data: [0,0, 0, 0, 0],
     lineTension: 0,
     fill: false,
     borderColor: 'rgb(80,151,215)'
@@ -90,7 +92,7 @@ var dataFirst = {
 
 var dataSecond = {
     label: "March 2020",
-    data: [20000, 15, 30000, 60, 65, 30, 10000],
+    data: [0,0, 0, 0, 0],
     lineTension: 0,
     fill: false,
   borderColor:  'rgb(231,109, 132)',
@@ -98,19 +100,16 @@ var dataSecond = {
 
   var thirdSecond = {
     label: "April 2020",
-    data: [10000, 2000, 3000, 10000, 37000, 30800, 3700],
+    data: [0,0, 0, 5021000, 0],
     lineTension: 0,
     fill: false,
   borderColor:  '#18bc9c ',
   };
 
 var speedData = {
-  labels: ['01','08','15','22','29'],
+  labels: ['0','7','15','22','29'],
   datasets: [dataFirst, dataSecond,thirdSecond]
 };
-
-
-
 
 var chartOptions = {
   legend: {

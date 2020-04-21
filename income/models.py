@@ -14,6 +14,8 @@ class Income(models.Model):
     amount = models.FloatField(blank=False, null=False)
     currency = models.CharField(max_length=20, default="USD")
     created_at = models.DateTimeField(auto_now=True)
+    description = models.TextField()
+    date = models.DateField(auto_now=True)
     source = models.CharField(
         max_length=200, choices=INCOME_SOURCE_OPTIONS, null=False, blank=False)
     owner = models.ForeignKey(
@@ -24,3 +26,10 @@ class Income(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Source(models.Model):
+    name = models.CharField(max_length=20, default="SALARY")
+
+    def __str__(self):
+        return self.name

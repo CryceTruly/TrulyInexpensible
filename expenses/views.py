@@ -11,6 +11,10 @@ import json
 import os
 
 
+def index(request):
+    return redirect('expenses')
+
+
 @login_required(login_url='/authentication/login')
 def search_expenses(request):
     data = request.body.decode('utf-8')
@@ -41,7 +45,7 @@ def expenses(request):
 @login_required(login_url='/authentication/login')
 def expenses_add(request):
     data = []
-    file = os.path.dirname(__file__)
+    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(file, 'currencies.json')
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
@@ -89,7 +93,7 @@ def expense_edit(request, id):
     data = []
     arr = []
 
-    file = os.path.dirname(__file__)
+    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(file, 'currencies.json')
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
@@ -235,6 +239,33 @@ def expense_summary_rest(request):
 
     data = {"months": months_data, "days": week_days_data}
     return JsonResponse({'data': data}, safe=False)
+
+
+def last_3months_stats(request):
+    todays_date = datetime.date.today()
+    three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
+    expenses = Expense.objects.filter(
+        date__gte=three_months_ago, date__lte=todays_date)
+
+    # categories occuring.
+    def get_categories(item):
+        return item.category
+    final = {}
+    categories = list(set(map(get_categories, expenses)))
+
+    def get_expense_count(y):
+        new = Expense.objects.filter(category=y)
+        count = new.count()
+        amount = 0
+        for y in new:
+            amount += y.amount
+        return {'count': count, 'amount': amount}
+
+    for x in expenses:
+        for y in categories:
+            final[y] = get_expense_count(y)
+
+    return JsonResponse({'category_data': final}, safe=False)
 
 
 @login_required(login_url='/authentication/login')
