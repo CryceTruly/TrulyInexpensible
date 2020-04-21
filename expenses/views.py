@@ -113,7 +113,6 @@ def expense_edit(request, id):
         return render(request, 'expenses/edit.html', context)
     amount = request.POST['amount']
     category = request.POST['category']
-    print(category)
     currency = request.POST['currency']
     name = request.POST['name']
     if not amount:

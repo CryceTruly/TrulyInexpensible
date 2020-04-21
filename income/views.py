@@ -286,9 +286,6 @@ def last_3months_income_source_stats(request):
     last_month = datetime.date.today() - datetime.timedelta(days=0)
     last_2_month = last_month - datetime.timedelta(days=30)
     last_3_month = last_2_month - datetime.timedelta(days=30)
-    print('last_month', last_month)
-    print('last_2_month', last_2_month)
-    print('last_3_month', last_3_month)
 
     last_month_income = Income.objects.filter(
         date__gte=last_month, date__lte=todays_date).order_by('date')
@@ -343,6 +340,4 @@ def last_3months_income_source_stats(request):
             prev_prev_month_data['29'] += x.amount
 
     keyed_data.append({str(last_3_month): prev_month_data})
-
-    print(keyed_data)
     return JsonResponse({'keyed_data': keyed_data}, safe=False)
