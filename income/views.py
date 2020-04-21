@@ -61,7 +61,7 @@ def income_add(request):
         'currencies': arr,
     }
     amount = request.POST['amount']
-    description = request.POST['name']
+    description = request.POST['description']
     currency = request.POST['currency']
 
     date = request.POST['date']
@@ -101,24 +101,28 @@ def income_edit(request, id):
     context = {
         'values': request.POST,
         'sources': sources,
-        'income': income
+        'income': income,
+        'currencies': arr
     }
     if request.method == 'GET':
         return render(request, 'income/edit.html', context)
     amount = request.POST['amount']
-    category = request.POST['category']
+    description = request.POST['description']
+    source = request.POST['source']
     currency = request.POST['currency']
-    name = request.POST['name']
+    name = request.POST['description']
+
+    if not source:
+        messages.error(request,  'source is required')
+        return render(request, 'income/edit.html', context)
     if not amount:
         messages.error(request,  'Amount is required')
-        return redirect('income')
-    if not name:
-        messages.error(request,  'Reason for the request is required')
-        return redirect('income')
+        return render(request, 'income/edit.html', context)
     income.amount = amount
-    income.name = name
+    income.description = name
+    income.description = description
     income.currency = currency
-    income.category = category
+    income.source = source
     income.save()
     messages.success(request,  'Income updated successfully')
     return redirect('income')
@@ -249,3 +253,96 @@ def income_delete(request, id):
     Income.objects.get(id=id).delete()
     messages.success(request, 'Income  Deleted')
     return redirect('income')
+
+
+def last_3months_income_stats(request):
+    todays_date = datetime.date.today()
+    three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
+    income = Income.objects.filter(
+        date__gte=three_months_ago, date__lte=todays_date)
+
+    # sources occuring.
+    def get_sources(item):
+        return item.source
+    final = {}
+    sources = list(set(map(get_sources, income)))
+
+    def get_sources_count(y):
+        new = Income.objects.filter(source=y)
+        count = new.count()
+        amount = 0
+        for y in new:
+            amount += y.amount
+        return {'count': count, 'amount': amount}
+
+    for x in income:
+        for y in sources:
+            final[y] = get_sources_count(y)
+    return JsonResponse({'sources_data': final}, safe=False)
+
+
+def last_3months_income_source_stats(request):
+    todays_date = datetime.date.today()
+    last_month = datetime.date.today() - datetime.timedelta(days=0)
+    last_2_month = last_month - datetime.timedelta(days=30)
+    last_3_month = last_2_month - datetime.timedelta(days=30)
+    print('last_month', last_month)
+    print('last_2_month', last_2_month)
+    print('last_3_month', last_3_month)
+
+    last_month_income = Income.objects.filter(
+        date__gte=last_month, date__lte=todays_date).order_by('date')
+    prev_month_income = Income.objects.filter(
+        date__gte=last_month, date__lte=last_2_month)
+    prev_prev_month_income = Income.objects.filter(
+        date__gte=last_2_month, date__lte=last_3_month)
+
+    keyed_data = []
+    this_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
+    prev_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
+    prev_prev_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
+
+    for x in last_month_income:
+        month = str(x.date)[:7]
+        date_in_month = str(x.date)[:2]
+        if int(date_in_month) <= 7:
+            this_month_data['7'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            this_month_data['15'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            this_month_data['22'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            this_month_data['29'] += x.amount
+
+    keyed_data.append({str(last_month): this_month_data})
+
+    for x in prev_month_income:
+        date_in_month = str(x.date)[:2]
+        month = str(x.date)[:7]
+        if int(date_in_month) <= 7:
+            prev_month_data['7'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            prev_month_data['15'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            prev_month_data['22'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            prev_month_data['29'] += x.amount
+
+    keyed_data.append({str(last_2_month): prev_month_data})
+
+    for x in prev_prev_month_income:
+        date_in_month = str(x.date)[:2]
+        month = str(x.date)[:7]
+        if int(date_in_month) <= 7:
+            prev_prev_month_data['7'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            prev_prev_month_data['15'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            prev_prev_month_data['22'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            prev_prev_month_data['29'] += x.amount
+
+    keyed_data.append({str(last_3_month): prev_month_data})
+
+    print(keyed_data)
+    return JsonResponse({'keyed_data': keyed_data}, safe=False)

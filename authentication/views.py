@@ -9,7 +9,6 @@ from .utils import account_activation_token
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.conf import settings
-
 from django.views.generic import View
 
 
@@ -43,9 +42,20 @@ class RegistrationView(View):
             else:
                 user = User.objects.create_user(
                     username=username, password=password, email=email)
+                user.is_active = False
                 user.save()
-                messages.success(
-                    request, 'You are now registered and can log in')
+                current_site = get_current_site(request)
+                email_subject = 'Activate Your Account'
+                message = render_to_string('authentication/activate_account.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                })
+                EmailThread(subject=email_subject, from_email=settings.EMAIL_HOST_USER,
+                            html_content=message, recipient_list=user.email).start()
+                messages.add_message(request, messages.SUCCESS, 'Account created successfully,please visit your email to '
+                                                                'verify your Account')
                 return redirect('login')
 
     def get(self, request):
@@ -58,9 +68,13 @@ class LoginView(View):
         password = request.POST['password']
         user = auth.authenticate(username=username, password=password)
         if user is not None:
-            auth.login(request, user)
-            messages.success(request, 'You are now logged in')
-            return redirect('expenses')
+            if user.is_active == True:
+                auth.login(request, user)
+                messages.success(request, 'You are now logged in')
+                return redirect('expenses')
+            else:
+                messages.error(request, 'Email is not verified')
+                return redirect('login')
         else:
             messages.error(request, 'Invalid credentials')
             return redirect('login')

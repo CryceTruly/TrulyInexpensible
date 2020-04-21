@@ -3,6 +3,7 @@ from . import views
 
 
 urlpatterns = [
+
     path("", views.expenses, name="expenses"),
     path("expenses_add", views.expenses_add, name="expenses_add"),
     path("expense_detail", views.expense_detail, name="expense_detail"),
@@ -12,4 +13,6 @@ urlpatterns = [
     path('expenses/search_expenses', views.search_expenses, name='search_expenses'),
     path('expenses/summary_rest', views.expense_summary_rest,
          name='expenses_summary_rest'),
+    path('expenses/three_months_summary', views.last_3months_stats,
+         name='three_months_summary'),
 ]

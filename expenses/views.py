@@ -11,6 +11,10 @@ import json
 import os
 
 
+def index(request):
+    return redirect('expenses')
+
+
 @login_required(login_url='/authentication/login')
 def search_expenses(request):
     data = request.body.decode('utf-8')
@@ -109,6 +113,7 @@ def expense_edit(request, id):
         return render(request, 'expenses/edit.html', context)
     amount = request.POST['amount']
     category = request.POST['category']
+    print(category)
     currency = request.POST['currency']
     name = request.POST['name']
     if not amount:
@@ -235,6 +240,33 @@ def expense_summary_rest(request):
 
     data = {"months": months_data, "days": week_days_data}
     return JsonResponse({'data': data}, safe=False)
+
+
+def last_3months_stats(request):
+    todays_date = datetime.date.today()
+    three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
+    expenses = Expense.objects.filter(
+        date__gte=three_months_ago, date__lte=todays_date)
+
+    # categories occuring.
+    def get_categories(item):
+        return item.category
+    final = {}
+    categories = list(set(map(get_categories, expenses)))
+
+    def get_expense_count(y):
+        new = Expense.objects.filter(category=y)
+        count = new.count()
+        amount = 0
+        for y in new:
+            amount += y.amount
+        return {'count': count, 'amount': amount}
+
+    for x in expenses:
+        for y in categories:
+            final[y] = get_expense_count(y)
+
+    return JsonResponse({'category_data': final}, safe=False)
 
 
 @login_required(login_url='/authentication/login')

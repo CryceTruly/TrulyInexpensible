@@ -15,9 +15,6 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Add Income</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
       <div class="modal-body">
             <form action="{%url 'income_add'%}" method="POST" autocomplete="off">
@@ -39,13 +36,13 @@
                   <label for="source">Source</label>
                   <select name="source" class="form-control" id="source">
           {% for source in  sources%}
-           <option name="source" value={{source.name}}>{{source.name}}</option>
+           <option name="source">{{source.name}}</option>
           {% endfor %}
                   </select>
            </div>
           <div class="form-group">
-            <label for="name"  class="col-form-label">Description:</label>
-            <textarea class="form-control" name="name" id="name"></textarea>
+            <label for="description"  class="col-form-label">Description:</label>
+            <textarea class="form-control" name="description" id="description"></textarea>
           </div>
             <div class="form-group">
             <label for="date"  class="col-form-label">Date of Income:</label>
