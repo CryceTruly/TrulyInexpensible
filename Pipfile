@@ -17,6 +17,7 @@ gunicorn = "*"
 django-filter = "*"
 validate-email = "*"
 six = "*"
+py3dns = "*"
 
 [requires]
 python_version = "3.7"
