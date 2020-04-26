@@ -22,7 +22,7 @@
 {% include 'partials/_alerts.html'%}
           <div class="form-group">
             <label for="amount" class="col-form-label">Amount:</label>
-            <input type="number" name="amount" class="form-control" id="amount">
+            <input type="number" name="amount" class="form-control" id="amount" value={{values.amount}}>
           </div>
                <div class="form-group">
                   <label for="exampleFormControlSelect1">Currency</label>
@@ -44,9 +44,9 @@
             <label for="name"  class="col-form-label">Description:</label>
             <textarea class="form-control" name="name" id="name"></textarea>
           </div>
-            <div class="form-group">
-            <label for="date"  class="col-form-label">Date of Expense:</label>
-            <input type="date" class="form-control" name="date" id="date"></input>
+           <div class="form-group">
+            <label for="ex_date"  class="col-form-label">Date of Expense:</label>
+            <input type="date" class="form-control" name="ex_date" id="ex_date"/>
           </div>
 
         <input type="submit" class="btn btn-primary" value="Submit">

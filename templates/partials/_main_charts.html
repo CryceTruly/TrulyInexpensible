@@ -2,8 +2,8 @@
 <div class="col-md-6">
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title">Expense Categories</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Distribution per category (Last 3 months)</h6>
+    <h5 class="card-title"></h5>
+    <h6 class="card-subtitle mb-2 text-muted"></h6>
 <canvas id="myChart" width="50" height="50"></canvas>
   </div>
 </div>
@@ -11,42 +11,36 @@
 const showChart=(data)=>{
 const [values,labels] = [Object.values(data.category_data).map(item=>item.amount),Object.keys(data.category_data)]
 var ctx = document.getElementById('myChart').getContext('2d');
+
 var myChart = new Chart(ctx, {
-    type: 'bar',
+    type: 'doughnut',
     data: {
-        labels: labels,
-        datasets: [{
-            label: 'Amount',
-            data: values,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
+      labels: labels,
+      datasets: [
+        {
+          label: "Expense Categories",
+          backgroundColor:   [
+                'rgb(80,151,215)',
+                '#18bc9c',
+                'rgb(231,109, 132)',
                 'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                 '#18bc9c'
             ],
-            borderWidth: 1
-        }]
+          data: values
+        }
+      ]
     },
     options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
-            }]
-        }
+      title: {
+        display: true,
+        text: 'Distribution per category (Last 3 months)'
+      }
     }
 });
+
+
+
+
 }
 
 const getCategoryData=()=>{
@@ -58,76 +52,103 @@ then(data=>
 )
 }
 
+
+const getCumulativeIncome=()=>{
+fetch('/expenses/last_3months_expense_source_stats').then(res=>res.json()).
+then(data=>
+{
+  showCMChart(data);
+}
+)
+}
+
+
 window.addEventListener('load',getCategoryData)
 
-
-
+window.addEventListener('load',getCumulativeIncome)
 
 
 </script>
-
 </div><div class="col-md-6">
 
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title">Cumulative Comparison</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Past 3 months Expenses</h6>
-<canvas id="speedChart" width="50" height="50"></canvas>
+<canvas id="cmchart" width="50" height="50"></canvas>
   </div>
 	<script>
-var monthCumulative = document.getElementById("speedChart");
 
-Chart.defaults.global.defaultFontFamily = "Lato";
-Chart.defaults.global.defaultFontSize = 18;
 
+const showCMChart=(data)=>{
+
+let labels=[]
+const monthsdata=[]
+let keys=null;
+
+for(let i=0;i<data.cumulative_income_data.length;i++){
+  const element=data.cumulative_income_data[i]
+  labels.push(Object.keys(element)[0])
+  const vals=Object.values(element)[0]
+  keys=Object.keys(vals)
+  monthsdata.push(Object.values(vals))
+}
+
+const getMonthRep=(dateObj)=>{
+  const strDate=new Date(dateObj).toDateString()
+  const splitted= strDate.split(' ')
+  const values=[splitted[1]+" "+splitted[3]]
+  return values
+}
+
+var monthCumulative = document.getElementById("cmchart");
 var dataFirst = {
-    label: "February 2020",
-    data: [2000, 5009, 7005, 200, 20001, 550, 400],
+    label: getMonthRep(labels[0]),
+    data: monthsdata[0],
     lineTension: 0,
     fill: false,
     borderColor: 'rgb(80,151,215)'
   };
 
 var dataSecond = {
-    label: "March 2020",
-    data: [20000, 15, 30000, 60, 65, 30, 10000],
+    label: getMonthRep(labels[1]),
+    data: monthsdata[1],
     lineTension: 0,
     fill: false,
   borderColor:  'rgb(231,109, 132)',
   };
 
   var thirdSecond = {
-    label: "April 2020",
-    data: [10000, 2000, 3000, 10000, 37000, 30800, 3700],
+    label: getMonthRep(labels[2]),
+    data: monthsdata[2],
     lineTension: 0,
     fill: false,
   borderColor:  '#18bc9c ',
   };
-
-var speedData = {
-  labels: ['01','08','15','22','29'],
+var monthsData = {
+  labels: keys,
   datasets: [dataFirst, dataSecond,thirdSecond]
 };
 
-
-
-
 var chartOptions = {
+      title: {
+        display: true,
+        text: 'Category Cumulative Comparison (Last 3 months)'
+      }
+    ,
   legend: {
     display: true,
     position: 'top',
     labels: {
       boxWidth: 10,
-      fontSize:10,
     }
   }
 };
 
 var lineChart = new Chart(monthCumulative, {
   type: 'line',
-  data: speedData,
+  data: monthsData,
   options: chartOptions
 });
+}
 
 	</script>
 </div>

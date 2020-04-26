@@ -25,31 +25,31 @@
 {% include 'partials/_alerts.html'%}
           <div class="form-group">
             <label for="amount" class="col-form-label">Amount:</label>
-            <input type="number" name="amount"  value={{expense.amount}} class="form-control" id="amount">
+            <input type="number" name="amount"  value={{values.amount}} class="form-control" id="amount">
           </div>
                <div class="form-group">
                   <label for="exampleFormControlSelect1">Currency</label>
-                  <select class="form-control" name="currency" id="currency" value={{expense.currency}}>
+                  <select class="form-control" name="currency" id="currency" value={{values.currency}}>
                     {% for currency in  currencies%}
-                    <option name="currency" value={{expense.currency}}>{{currency.name}} - {{currency.value}} </option>
+                    <option name="currency" value={{values.currency}}>{{currency.name}} - {{currency.value}} </option>
                     {% endfor %}
                   </select>
            </div>
                 <div class="form-group">
                   <label for="category">Category</label>
-                  <select name="category" class="form-control" id="category" value={{expense.category}}>
+                  <select name="category" class="form-control" id="category">
           {% for category in  categories%}
-           <option name="category" value={{expense.category}}>{{category.name}}</option>
+           <option name="category">{{category.name}}</option>
           {% endfor %}
                   </select>
            </div>
           <div class="form-group">
             <label for="name"  class="col-form-label">Description:</label>
-            <textarea class="form-control" name="name" id="name">{{expense.name}}</textarea>
+            <textarea class="form-control" name="name" id="name">{{values.name}}</textarea>
           </div>
             <div class="form-group">
             <label for="date"  class="col-form-label">Date of Expense:</label>
-            <input type="date" class="form-control"  value={{expense.date}} name="date" id="date"></input>
+            <input type="date" class="form-control"  value={{values.date |date:'d/m/Y' }} name="date" id="date"></input>
           </div>
 
         <input type="submit" class="btn btn-primary" value="Submit">
@@ -59,9 +59,6 @@
         </form>
   </div>
 </div>
-
-{% include 'partials/_alerts.html'%}
-
   </div>
 </section>
 {%endblock%}
