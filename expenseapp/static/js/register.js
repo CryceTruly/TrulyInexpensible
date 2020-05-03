@@ -7,6 +7,7 @@ const email_check_done = document.querySelector(".email-check-done");
 const emailField = document.querySelector(".user-email");
 const passwordField = document.querySelector(".passwordField");
 const showToggler = document.querySelector(".show-toggler");
+
 showToggler.addEventListener("click", () => {
   if (showToggler.textContent == "SHOW") {
     showToggler.textContent = "HIDE";
@@ -22,6 +23,7 @@ const checkUserName = async (e) => {
   username_spinner.style.display = "none";
   username_check_done.style.display = "none";
   document.querySelector(".invalid-feedback").style.display = "none";
+
   if (value.trim().length > 0) {
     username_spinner.style.display = "block";
     document.querySelector(".invalid-feedback").style.display = "none";
@@ -30,8 +32,8 @@ const checkUserName = async (e) => {
       body: JSON.stringify({ username: value }),
       method: "post",
     });
-    let data = await response.json();
 
+    let data = await response.json();
     if (data.is_available) {
       username_spinner.style.display = "none";
       username_check_done.style.display = "block";
@@ -60,7 +62,6 @@ const checkEmail = async (e) => {
   if (value.trim().length > 0) {
     email_spinner.style.display = "block";
     document.querySelector(".invalid-feedback").style.display = "none";
-
     let response = await fetch(`/authentication/check_email`, {
       body: JSON.stringify({ email: value }),
       method: "post",
@@ -84,7 +85,5 @@ const checkEmail = async (e) => {
     email_check_done.style.display = "none";
   }
 };
-
 username.addEventListener("keyup", checkUserName);
-
 emailField.addEventListener("keyup", checkEmail);
