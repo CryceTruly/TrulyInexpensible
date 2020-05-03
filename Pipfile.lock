@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e445bbfa55fcfd7b35a9ba83876c75b120cbd45d75802ba1468c859479093b14"
+            "sha256": "c47b08b324e2c4ca21d0cb2d1043b934059d2225667819b0e176de8a81a1b988"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -126,6 +126,13 @@
             "index": "pypi",
             "version": "==2.7.7"
         },
+        "py3dns": {
+            "hashes": [
+                "sha256:1f07d4463e98d9859ce0280c3eaa57da670ad623f6d4d3285c67dca23d7045e4"
+            ],
+            "index": "pypi",
+            "version": "==3.2.1"
+        },
         "pytz": {
             "hashes": [
                 "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d",
@@ -173,10 +180,10 @@
         },
         "autopep8": {
             "hashes": [
-                "sha256:cc6be1dfd46f2c7fa00e84a357f1a269683985b09eaffb47654ed551194399eb"
+                "sha256:152fd8fe47d02082be86e05001ec23d6f420086db56b17fc883f3f965fb34954"
             ],
             "index": "pypi",
-            "version": "==1.5.1"
+            "version": "==1.5.2"
         },
         "isort": {
             "hashes": [

@@ -10,6 +10,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.generic import View
+from django.http import JsonResponse
+from validate_email import validate_email
+import json
 
 
 class EmailThread(threading.Thread):
@@ -23,6 +26,35 @@ class EmailThread(threading.Thread):
     def run(self):
         send_mail(message=self.html_content, from_email=settings.EMAIL_HOST_USER, subject=self.subject,
                   recipient_list=[self.recipient_list])
+
+
+class UsernameValidationView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        username = data.get('username', '')
+        if not str(username).isalnum():
+            return JsonResponse({'error': 'username can  only contain letters and numbers'})
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'username is taken,please choose a new one'})
+        return JsonResponse({'is_available': 'true'})
+
+
+class CredentialsValidationView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        email = data.get('email', '')
+        if not email:
+            return JsonResponse({'error': 'Please enter an email'})
+        is_valid = validate_email(email)
+        if not is_valid:
+            return JsonResponse({'error': 'Please enter a valid email'})
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'error': 'Email is taken,please choose a new one'})
+        # if not validate_email(email, check_mx=True):
+        #     return JsonResponse({'error': 'The email domain server does not exist'})
+        # if not validate_email(email, verify=True):
+        #     return JsonResponse({'error': 'The email does not exist on the domain server'})
+        return JsonResponse({'valid': True})
 
 
 class RegistrationView(View):

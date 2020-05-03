@@ -15,4 +15,7 @@ urlpatterns = [
          name='expenses_summary_rest'),
     path('expenses/three_months_summary', views.last_3months_stats,
          name='three_months_summary'),
+
+    path('expenses/last_3months_expense_source_stats',
+         views.last_3months_expense_source_stats, name="last_3months_expense_source_stats")
 ]

@@ -9,7 +9,6 @@ tableArea.style.display = "block";
 outputArea.style.display = "none";
 currentPaginator.style.display = "block";
 const showResults = (data) => {
-  console.log("data", data);
   for (let expense = 0; expense < data.length; expense++) {
     resultRows.innerHTML += `
         <tr class="text-sm-left small">

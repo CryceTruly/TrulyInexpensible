@@ -15,10 +15,10 @@ import os
 def search_income(request):
     data = request.body.decode('utf-8')
     search_val = json.loads(data).get('data')
-    income = Income.objects.filter(name__icontains=search_val, owner=request.user) | Income.objects.filter(
+    income = Income.objects.filter(description__icontains=search_val, owner=request.user) | Income.objects.filter(
         amount__startswith=search_val, owner=request.user) | Income.objects.filter(
         date__icontains=search_val, owner=request.user) | Income.objects.filter(
-        category__icontains=search_val, owner=request.user)
+        source__icontains=search_val, owner=request.user)
     data = list(income.values())
     return JsonResponse(data, safe=False)
 
@@ -198,7 +198,7 @@ def income_summary(request):
 
 
 def income_summary_rest(request):
-    all_income = Income.objects.all()
+    all_income = Income.objects.filter(owner=request.user)
     today = datetime.datetime.today().date()
     today_amount = 0
     months_data = {}
@@ -258,10 +258,10 @@ def income_delete(request, id):
 def last_3months_income_stats(request):
     todays_date = datetime.date.today()
     three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
-    income = Income.objects.filter(
-        date__gte=three_months_ago, date__lte=todays_date)
-
+    income = Income.objects.filter(owner=request.user,
+                                   date__gte=three_months_ago, date__lte=todays_date)
     # sources occuring.
+
     def get_sources(item):
         return item.source
     final = {}
@@ -287,29 +287,29 @@ def last_3months_income_source_stats(request):
     last_2_month = last_month - datetime.timedelta(days=30)
     last_3_month = last_2_month - datetime.timedelta(days=30)
 
-    last_month_income = Income.objects.filter(
-        date__gte=last_month, date__lte=todays_date).order_by('date')
-    prev_month_income = Income.objects.filter(
-        date__gte=last_month, date__lte=last_2_month)
-    prev_prev_month_income = Income.objects.filter(
-        date__gte=last_2_month, date__lte=last_3_month)
+    last_month_income = Income.objects.filter(owner=request.user,
+                                              date__gte=last_month, date__lte=todays_date).order_by('date')
+    prev_month_income = Income.objects.filter(owner=request.user,
+                                              date__gte=last_month, date__lte=last_2_month)
+    prev_prev_month_income = Income.objects.filter(owner=request.user,
+                                                   date__gte=last_2_month, date__lte=last_3_month)
 
     keyed_data = []
-    this_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
-    prev_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
-    prev_prev_month_data = {'7': 0, '15': 0, '22': 0, '29': 0}
+    this_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
+    prev_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
+    prev_prev_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
 
     for x in last_month_income:
         month = str(x.date)[:7]
         date_in_month = str(x.date)[:2]
         if int(date_in_month) <= 7:
-            this_month_data['7'] += x.amount
+            this_month_data['7th'] += x.amount
         if int(date_in_month) > 7 and int(date_in_month) <= 15:
-            this_month_data['15'] += x.amount
+            this_month_data['15th'] += x.amount
         if int(date_in_month) >= 16 and int(date_in_month) <= 21:
-            this_month_data['22'] += x.amount
+            this_month_data['22nd'] += x.amount
         if int(date_in_month) > 22 and int(date_in_month) < 31:
-            this_month_data['29'] += x.amount
+            this_month_data['29th'] += x.amount
 
     keyed_data.append({str(last_month): this_month_data})
 
@@ -317,13 +317,13 @@ def last_3months_income_source_stats(request):
         date_in_month = str(x.date)[:2]
         month = str(x.date)[:7]
         if int(date_in_month) <= 7:
-            prev_month_data['7'] += x.amount
+            prev_month_data['7th'] += x.amount
         if int(date_in_month) > 7 and int(date_in_month) <= 15:
-            prev_month_data['15'] += x.amount
+            prev_month_data['15th'] += x.amount
         if int(date_in_month) >= 16 and int(date_in_month) <= 21:
-            prev_month_data['22'] += x.amount
+            prev_month_data['22nd'] += x.amount
         if int(date_in_month) > 22 and int(date_in_month) < 31:
-            prev_month_data['29'] += x.amount
+            prev_month_data['29th'] += x.amount
 
     keyed_data.append({str(last_2_month): prev_month_data})
 
@@ -331,13 +331,13 @@ def last_3months_income_source_stats(request):
         date_in_month = str(x.date)[:2]
         month = str(x.date)[:7]
         if int(date_in_month) <= 7:
-            prev_prev_month_data['7'] += x.amount
+            prev_prev_month_data['7th'] += x.amount
         if int(date_in_month) > 7 and int(date_in_month) <= 15:
-            prev_prev_month_data['15'] += x.amount
+            prev_prev_month_data['15th'] += x.amount
         if int(date_in_month) >= 16 and int(date_in_month) <= 21:
-            prev_prev_month_data['22'] += x.amount
+            prev_prev_month_data['22nd'] += x.amount
         if int(date_in_month) > 22 and int(date_in_month) < 31:
-            prev_prev_month_data['29'] += x.amount
+            prev_prev_month_data['29th'] += x.amount
 
     keyed_data.append({str(last_3_month): prev_month_data})
-    return JsonResponse({'keyed_data': keyed_data}, safe=False)
+    return JsonResponse({'cumulative_income_data': keyed_data}, safe=False)

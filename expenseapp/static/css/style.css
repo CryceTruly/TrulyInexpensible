@@ -57,3 +57,12 @@
   right: 10%;
   margin-top: 2px;
 }
+
+.show-toggler {
+  cursor: pointer;
+  color: cornflowerblue;
+  transition: all;
+}
+.show-toggler:hover {
+  transform: scale(1.1);
+}

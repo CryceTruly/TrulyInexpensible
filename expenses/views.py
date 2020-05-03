@@ -69,9 +69,13 @@ def expenses_add(request):
     name = request.POST['name']
     currency = request.POST['currency']
     category = request.POST['category']
-    date = request.POST['date']
+    date = request.POST['ex_date']
     if not amount:
         messages.error(request,  'Amount is required')
+        return render(request=request, template_name='expenses/new.html', context=context)
+
+    if not date:
+        messages.error(request,  'Date is required')
         return render(request=request, template_name='expenses/new.html', context=context)
     if not category:
         messages.error(request,  'Expense Category is required')
@@ -110,6 +114,12 @@ def expense_edit(request, id):
         'expense': expense
     }
     if request.method == 'GET':
+        context = {
+            'values': expense,
+            'currencies': arr,
+            'categories': categories,
+            'expense': expense
+        }
         return render(request, 'expenses/edit.html', context)
     amount = request.POST['amount']
     category = request.POST['category']
@@ -117,10 +127,7 @@ def expense_edit(request, id):
     name = request.POST['name']
     if not amount:
         messages.error(request,  'Amount is required')
-        return redirect('expenses')
-    if not name:
-        messages.error(request,  'Reason for the request is required')
-        return redirect('expenses')
+        return render(request, 'expenses/edit.html', context)
     expense.amount = amount
     expense.name = name
     expense.currency = currency
@@ -141,7 +148,7 @@ def expense_delete(request):
 
 @login_required(login_url='/authentication/login')
 def expense_summary(request):
-    all_expenses = Expense.objects.all()
+    all_expenses = Expense.objects.filter(owner=request.user)
     today = datetime.datetime.today().date()
     today2 = datetime.date.today()
     week_ago = today - datetime.timedelta(days=7)
@@ -200,7 +207,7 @@ def expense_summary(request):
 
 
 def expense_summary_rest(request):
-    all_expenses = Expense.objects.all()
+    all_expenses = Expense.objects.filter(owner=request.user,)
     today = datetime.datetime.today().date()
     today_amount = 0
     months_data = {}
@@ -244,8 +251,8 @@ def expense_summary_rest(request):
 def last_3months_stats(request):
     todays_date = datetime.date.today()
     three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
-    expenses = Expense.objects.filter(
-        date__gte=three_months_ago, date__lte=todays_date)
+    expenses = Expense.objects.filter(owner=request.user,
+                                      date__gte=three_months_ago, date__lte=todays_date)
 
     # categories occuring.
     def get_categories(item):
@@ -254,7 +261,7 @@ def last_3months_stats(request):
     categories = list(set(map(get_categories, expenses)))
 
     def get_expense_count(y):
-        new = Expense.objects.filter(category=y)
+        new = Expense.objects.filter(category=y,)
         count = new.count()
         amount = 0
         for y in new:
@@ -264,7 +271,6 @@ def last_3months_stats(request):
     for x in expenses:
         for y in categories:
             final[y] = get_expense_count(y)
-
     return JsonResponse({'category_data': final}, safe=False)
 
 
@@ -282,3 +288,65 @@ def expense_delete(request, id):
     Expense.objects.get(id=id).delete()
     messages.success(request, 'Expense  Deleted')
     return redirect('expenses')
+
+
+def last_3months_expense_source_stats(request):
+    todays_date = datetime.date.today()
+    last_month = datetime.date.today() - datetime.timedelta(days=0)
+    last_2_month = last_month - datetime.timedelta(days=30)
+    last_3_month = last_2_month - datetime.timedelta(days=30)
+
+    last_month_income = Expense.objects.filter(owner=request.user,
+                                               date__gte=last_month, date__lte=todays_date).order_by('date')
+    prev_month_income = Expense.objects.filter(owner=request.user,
+                                               date__gte=last_month, date__lte=last_2_month)
+    prev_prev_month_income = Expense.objects.filter(owner=request.user,
+                                                    date__gte=last_2_month, date__lte=last_3_month)
+
+    keyed_data = []
+    this_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
+    prev_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
+    prev_prev_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}
+
+    for x in last_month_income:
+        month = str(x.date)[:7]
+        date_in_month = str(x.date)[:2]
+        if int(date_in_month) <= 7:
+            this_month_data['7th'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            this_month_data['15th'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            this_month_data['22nd'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            this_month_data['29th'] += x.amount
+
+    keyed_data.append({str(last_month): this_month_data})
+
+    for x in prev_month_income:
+        date_in_month = str(x.date)[:2]
+        month = str(x.date)[:7]
+        if int(date_in_month) <= 7:
+            prev_month_data['7th'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            prev_month_data['15th'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            prev_month_data['22nd'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            prev_month_data['29th'] += x.amount
+
+    keyed_data.append({str(last_2_month): prev_month_data})
+
+    for x in prev_prev_month_income:
+        date_in_month = str(x.date)[:2]
+        month = str(x.date)[:7]
+        if int(date_in_month) <= 7:
+            prev_prev_month_data['7th'] += x.amount
+        if int(date_in_month) > 7 and int(date_in_month) <= 15:
+            prev_prev_month_data['15th'] += x.amount
+        if int(date_in_month) >= 16 and int(date_in_month) <= 21:
+            prev_prev_month_data['22nd'] += x.amount
+        if int(date_in_month) > 22 and int(date_in_month) < 31:
+            prev_prev_month_data['29th'] += x.amount
+
+    keyed_data.append({str(last_3_month): prev_month_data})
+    return JsonResponse({'cumulative_income_data': keyed_data}, safe=False)
