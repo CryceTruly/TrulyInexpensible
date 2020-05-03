@@ -5,6 +5,17 @@ const submit = document.querySelector(".submit-btn");
 const email_spinner = document.querySelector(".email_spinner");
 const email_check_done = document.querySelector(".email-check-done");
 const emailField = document.querySelector(".user-email");
+const passwordField = document.querySelector(".passwordField");
+const showToggler = document.querySelector(".show-toggler");
+showToggler.addEventListener("click", () => {
+  if (showToggler.textContent == "SHOW") {
+    showToggler.textContent = "HIDE";
+    passwordField.setAttribute("type", "text");
+  } else {
+    showToggler.textContent = "SHOW";
+    passwordField.setAttribute("type", "password");
+  }
+});
 
 const checkUserName = async (e) => {
   const value = e.target.value;
@@ -39,8 +50,6 @@ const checkUserName = async (e) => {
     username_spinner.style.display = "none";
     username_check_done.style.display = "none";
   }
-
-  console.log("data", data);
 };
 
 const checkEmail = async (e) => {

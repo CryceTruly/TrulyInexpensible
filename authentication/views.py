@@ -50,10 +50,10 @@ class CredentialsValidationView(View):
             return JsonResponse({'error': 'Please enter a valid email'})
         if User.objects.filter(email=email).exists():
             return JsonResponse({'error': 'Email is taken,please choose a new one'})
-        if not validate_email(email, check_mx=True):
-            return JsonResponse({'error': 'The email domain server does not exist'})
-        if not validate_email(email, verify=True):
-            return JsonResponse({'error': 'The email does not exist on the domain server'})
+        # if not validate_email(email, check_mx=True):
+        #     return JsonResponse({'error': 'The email domain server does not exist'})
+        # if not validate_email(email, verify=True):
+        #     return JsonResponse({'error': 'The email does not exist on the domain server'})
         return JsonResponse({'valid': True})
 
 
