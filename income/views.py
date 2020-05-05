@@ -9,6 +9,7 @@ import datetime
 import calendar
 import json
 import os
+from settings.models import Setting
 
 
 @login_required(login_url='/authentication/login')
@@ -31,6 +32,7 @@ def income(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
+        'currency': Setting.objects.get(user=request.user).currency.split('-')[0],
         'sources': sources,
         'income': income,
         'page_obj': page_obj,
@@ -41,39 +43,34 @@ def income(request):
 @login_required(login_url='/authentication/login')
 def income_add(request):
     sources = Source.objects.all()
-    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    file_path = os.path.join(file, 'currencies.json')
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-        json_file.close()
-    sources = Source.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
     if request.method == 'GET':
         context = {
-            'currencies': arr,
+            'settings': Setting.objects.get(user=request.user),
             'sources': sources}
         return render(request=request, template_name='income/new.html', context=context)
     context = {
         'values': request.POST,
         'sources': sources,
-        'currencies': arr,
     }
     amount = request.POST['amount']
     description = request.POST['description']
-    currency = request.POST['currency']
 
-    date = request.POST['date']
+    date = request.POST['ex_date']
     source = request.POST['source']
+
     if not amount:
         messages.error(request,  'Amount is required')
         return render(request=request, template_name='income/new.html', context=context)
     if not source:
         messages.error(request,  'Income Source is required')
         return render(request=request, template_name='income/new.html', context=context)
+
+    if not date:
+        messages.error(request,  'Date is required')
+        return render(request=request, template_name='income/new.html', context=context)
+
     income = Income.objects.create(
-        amount=amount, description=description, source=source, currency=currency, date=date, owner=request.user)
+        amount=amount, description=description, source=source, date=date, owner=request.user)
 
     if income:
         messages.success(request,  'Income was submitted successfully')
@@ -86,32 +83,18 @@ def income_add(request):
 def income_edit(request, id):
     income = Income.objects.get(pk=id)
     sources = Source.objects.all()
-    data = []
-    arr = []
-    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    file_path = os.path.join(file, 'currencies.json')
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-        json_file.close()
-    sources = Source.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
-
     context = {
         'values': request.POST,
         'sources': sources,
         'income': income,
-        'currencies': arr
     }
     if request.method == 'GET':
         return render(request, 'income/edit.html', context)
     amount = request.POST['amount']
     description = request.POST['description']
     source = request.POST['source']
-    currency = request.POST['currency']
     name = request.POST['description']
-
+    date = request.POST['ex_date']
     if not source:
         messages.error(request,  'source is required')
         return render(request, 'income/edit.html', context)
@@ -121,8 +104,8 @@ def income_edit(request, id):
     income.amount = amount
     income.description = name
     income.description = description
-    income.currency = currency
     income.source = source
+    income.date = date
     income.save()
     messages.success(request,  'Income updated successfully')
     return redirect('income')
@@ -172,6 +155,7 @@ def income_summary(request):
             this_year_count += 1
 
     context = {
+        'currency': Setting.objects.get(user=request.user).currency.split('-')[0],
         'today': {
             'amount': todays_amount,
             "count": todays_count,
