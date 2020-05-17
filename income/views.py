@@ -26,6 +26,8 @@ def search_income(request):
 
 @login_required(login_url='/authentication/login')
 def income(request):
+    if not Setting.objects.filter(user=request.user).exists():
+        messages.info(request, 'Please choose your preferred currency')
     sources = Source.objects.all()
     income = Income.objects.filter(owner=request.user)
     paginator = Paginator(income, 5)  # Show 7 items per page.

@@ -128,7 +128,9 @@ class VerificationView(View):
             messages.add_message(request, messages.INFO,
                                  "Account has been activated,you may login now")
             return redirect('login')
-        return render(request, "authentication/invalid_activation.html", status=401)
+        messages.add_message(request, messages.WARNING,
+                             "verification Link was used before,please login")
+        return redirect('login')
 
 
 class ProfileView(View):

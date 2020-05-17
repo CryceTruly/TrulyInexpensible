@@ -34,9 +34,14 @@ def expenses(request):
     paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    currency = Setting.objects.get(user=request.user).currency
+    userprefs = Setting.objects.filter(user=request.user)
+
+    currency = 'Currency Not Set'
+
+    if userprefs.exists():
+        currency = userprefs[0].currency.split('-')[0],
     context = {
-        'currency': currency.split('-')[0],
+        'currency': currency,
         'categories': categories,
         'expenses': expenses,
         'page_obj': page_obj,
@@ -47,10 +52,16 @@ def expenses(request):
 @login_required(login_url='/authentication/login')
 def expenses_add(request):
     categories = Category.objects.all()
+
+    if not Setting.objects.filter(user=request.user).exists():
+        messages.info(request, 'Please choose your preferred currency')
+
+        return redirect('general-settings')
+
     if request.method == 'GET':
         context = {
             'categories': categories,
-            'settings': Setting.objects.get(user=request.user)
+            'settings': Setting.objects.filter(user=request.user)[0] if Setting.objects.filter(user=request.user).exists() else {}
         }
         return render(request=request, template_name='expenses/new.html', context=context)
     context = {

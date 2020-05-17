@@ -8,7 +8,8 @@ from django.conf import settings
 
 
 def index(request):
-    user_settings = Setting.objects.get(user=request.user)
+    user_settings = Setting.objects.filter(user=request.user)[
+        0] if Setting.objects.filter(user=request.user).exists() else None
     data = []
     file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(settings.BASE_DIR, 'currencies.json')
@@ -21,9 +22,12 @@ def index(request):
         return render(request, 'settings/index.html', context={'currencies': arr, 'settings': user_settings})
     else:
         currency = request.POST['currency']
-        user_settings.currency = currency
-        user_settings.save()
-
+        if user_settings:
+            user_settings.currency = currency
+            user_settings.save()
+        else:
+            Setting.objects.create(user=request.user, currency=currency)
+            user_settings['currency'] = currency
         messages.success(request, 'Changes saved successfully')
 
         return render(request, 'settings/index.html', context={'currencies': arr, 'settings': user_settings})
