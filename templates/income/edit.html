@@ -41,7 +41,7 @@
           </div>
             <div class="form-group">
             <label for="date"  class="col-form-label">Date of Income:</label>
-            <input type="date" class="form-control" name="ex_date" id="date"></input>
+            <input type="date" class="form-control"  value="{{income.income_date |date:'Y-m-d'}}" name="ex_date" id="date"></input>
           </div>
 
         <input type="submit" class="btn btn-primary" value="Submit">

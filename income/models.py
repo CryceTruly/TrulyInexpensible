@@ -15,7 +15,7 @@ class Income(models.Model):
     currency = models.CharField(max_length=20, default="USD")
     created_at = models.DateTimeField(auto_now=True)
     description = models.TextField(default='_')
-    date = models.DateField(default=now)
+    income_date = models.DateField(default=now)
     source = models.CharField(
         max_length=200, choices=INCOME_SOURCE_OPTIONS, null=False, blank=False)
     owner = models.ForeignKey(

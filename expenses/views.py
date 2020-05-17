@@ -18,8 +18,7 @@ def index(request):
 
 @login_required(login_url='/authentication/login')
 def search_expenses(request):
-    data = request.body.decode('utf-8')
-    search_val = json.loads(data).get('data')
+    search_val = json.loads(request.body).get('data')
     expenses = Expense.objects.filter(name__icontains=search_val, owner=request.user) | Expense.objects.filter(
         amount__startswith=search_val, owner=request.user) | Expense.objects.filter(
         date__icontains=search_val, owner=request.user) | Expense.objects.filter(
@@ -32,7 +31,7 @@ def search_expenses(request):
 def expenses(request):
     categories = Category.objects.all()
     expenses = Expense.objects.filter(owner=request.user)
-    paginator = Paginator(expenses, 5)  # Show 7 items per page.
+    paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     currency = Setting.objects.get(user=request.user).currency
