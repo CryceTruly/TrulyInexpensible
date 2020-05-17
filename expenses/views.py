@@ -38,7 +38,7 @@ def expenses(request):
     paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    currency = Setting.objects.get(user=request.user)
+    currency = Setting.objects.get(user=request.user).currency
     context = {
         'currency': currency.split('-')[0],
         'categories': categories,
