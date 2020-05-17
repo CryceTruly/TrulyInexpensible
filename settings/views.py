@@ -22,7 +22,7 @@ def index(request):
         return render(request, 'settings/index.html', context={'currencies': arr, 'settings': user_settings})
     else:
         currency = request.POST['currency']
-        if user_settings:
+        if user_settings is not None:
             user_settings.currency = currency
             user_settings.save()
         else:
