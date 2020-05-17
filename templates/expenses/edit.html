@@ -27,14 +27,6 @@
             <label for="amount" class="col-form-label">Amount:</label>
             <input type="number" name="amount"  value={{values.amount}} class="form-control" id="amount">
           </div>
-               <div class="form-group">
-                  <label for="exampleFormControlSelect1">Currency</label>
-                  <select class="form-control" name="currency" id="currency" value={{values.currency}}>
-                    {% for currency in  currencies%}
-                    <option name="currency" value={{values.currency}}>{{currency.name}} - {{currency.value}} </option>
-                    {% endfor %}
-                  </select>
-           </div>
                 <div class="form-group">
                   <label for="category">Category</label>
                   <select name="category" class="form-control" id="category">
@@ -49,7 +41,7 @@
           </div>
             <div class="form-group">
             <label for="date"  class="col-form-label">Date of Expense:</label>
-            <input type="date" class="form-control"  value={{values.date |date:'d/m/Y' }} name="date" id="date"></input>
+            <input type="date" class="form-control"  value={{values.date |date:'Y-m-d' }} name="date" id="date"></input>
           </div>
 
         <input type="submit" class="btn btn-primary" value="Submit">

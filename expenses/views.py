@@ -9,6 +9,7 @@ import datetime
 import calendar
 import json
 import os
+from settings.models import Setting
 
 
 def index(request):
@@ -17,8 +18,7 @@ def index(request):
 
 @login_required(login_url='/authentication/login')
 def search_expenses(request):
-    data = request.body.decode('utf-8')
-    search_val = json.loads(data).get('data')
+    search_val = json.loads(request.body).get('data')
     expenses = Expense.objects.filter(name__icontains=search_val, owner=request.user) | Expense.objects.filter(
         amount__startswith=search_val, owner=request.user) | Expense.objects.filter(
         date__icontains=search_val, owner=request.user) | Expense.objects.filter(
@@ -31,10 +31,12 @@ def search_expenses(request):
 def expenses(request):
     categories = Category.objects.all()
     expenses = Expense.objects.filter(owner=request.user)
-    paginator = Paginator(expenses, 5)  # Show 7 items per page.
+    paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    currency = Setting.objects.get(user=request.user).currency
     context = {
+        'currency': currency.split('-')[0],
         'categories': categories,
         'expenses': expenses,
         'page_obj': page_obj,
@@ -44,30 +46,19 @@ def expenses(request):
 
 @login_required(login_url='/authentication/login')
 def expenses_add(request):
-    data = []
-    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    file_path = os.path.join(file, 'currencies.json')
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-        json_file.close()
     categories = Category.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
     if request.method == 'GET':
         context = {
             'categories': categories,
-            'currencies': arr
+            'settings': Setting.objects.get(user=request.user)
         }
         return render(request=request, template_name='expenses/new.html', context=context)
     context = {
         'values': request.POST,
-        'currencies': arr,
         'categories': categories,
     }
     amount = request.POST['amount']
     name = request.POST['name']
-    currency = request.POST['currency']
     category = request.POST['category']
     date = request.POST['ex_date']
     if not amount:
@@ -81,7 +72,7 @@ def expenses_add(request):
         messages.error(request,  'Expense Category is required')
         return render(request=request, template_name='expenses/new.html', context=context)
     expense = Expense.objects.create(
-        amount=amount, name=name, currency=currency, date=date, category=category, owner=request.user)
+        amount=amount, name=name, date=date, category=category, owner=request.user)
 
     if expense:
         messages.success(request,  'Expense was submitted successfully')
@@ -103,34 +94,26 @@ def expense_edit(request, id):
         data = json.load(json_file)
         json_file.close()
     categories = Category.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
-
     context = {
         'values': request.POST,
-        'currencies': arr,
         'categories': categories,
         'expense': expense
     }
     if request.method == 'GET':
         context = {
             'values': expense,
-            'currencies': arr,
             'categories': categories,
             'expense': expense
         }
         return render(request, 'expenses/edit.html', context)
     amount = request.POST['amount']
     category = request.POST['category']
-    currency = request.POST['currency']
     name = request.POST['name']
     if not amount:
         messages.error(request,  'Amount is required')
         return render(request, 'expenses/edit.html', context)
     expense.amount = amount
     expense.name = name
-    expense.currency = currency
     expense.category = category
     expense.save()
     messages.success(request,  'Expense updated successfully')
@@ -180,7 +163,9 @@ def expense_summary(request):
             this_year_amount += one.amount
             this_year_count += 1
 
+    currency = Setting.objects.get(user=request.user).currency
     context = {
+        'currency': currency.split('-')[0],
         'today': {
             'amount': todays_amount,
             "count": todays_count,

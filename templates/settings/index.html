@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+<h4>Preferred Currency</h4>
+
+{% include 'partials/_alerts.html' %}
+<form action="{% url 'general-settings'%}" method="post">
+
+{% csrf_token %}
+<div class="input-group">
+
+
+  <select name="currency" class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+  {% if settings.currency %}<option selected>{{settings.currency}}</option>
+  {% else %}<option selected>Choose a currency</option>{% endif %}
+ {% for currency in  currencies%}
+<option name="currency"   value="{{currency.name}}  - {{currency.value}}" >{{currency.name}} - {{currency.value}} </option>
+
+ {% endfor %}
+  </select>
+  <div class="input-group-append">
+    <input type="submit" class="btn btn-outline-secondary" value="Save">
+  </div>
+
+</div>
+
+</form>
+</div>
+</div>
+
+{% endblock content %}

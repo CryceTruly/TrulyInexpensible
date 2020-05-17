@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 
 class Expense(models.Model):
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, default='')
     date = models.DateField(default=now)
     amount = models.FloatField(blank=False, null=False)
     currency = models.CharField(max_length=20, default="USD")

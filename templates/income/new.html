@@ -22,14 +22,20 @@
 {% include 'partials/_alerts.html'%}
           <div class="form-group">
             <label for="amount" class="col-form-label">Amount:</label>
-            <input type="number" name="amount" class="form-control" id="amount">
+            <input type="number" name="amount"   value="{{values.amount}}" class="form-control" id="amount">
           </div>
-               <div class="form-group">
+            <div class="form-group">
                   <label for="exampleFormControlSelect1">Currency</label>
-                  <select class="form-control" name="currency" id="currency">
-                    {% for currency in  currencies%}
+                  <select class="form-control" name="currency" id="currency" {% if settings.currency%}disabled>
+                    <option name="currency"  selected  value={{settings.currency}}>{{settings.currency}}</option>
+{% else %}
+ {% for currency in  currencies%}
                     <option name="currency"   value={{currency.name}}>{{currency.name}} - {{currency.value}} </option>
                     {% endfor %}
+
+
+                  {% endif %}>
+
                   </select>
            </div>
                 <div class="form-group">
@@ -42,11 +48,11 @@
            </div>
           <div class="form-group">
             <label for="description"  class="col-form-label">Description:</label>
-            <textarea class="form-control" name="description" id="description"></textarea>
+            <textarea class="form-control" name="description" id="description">{{values.description}} </textarea>
           </div>
             <div class="form-group">
             <label for="date"  class="col-form-label">Date of Income:</label>
-            <input type="date" class="form-control" name="date" id="date"></input>
+            <input type="date" class="form-control" name="ex_date"  value={{values.ex_date}}  id="date"></input>
           </div>
         <input type="submit" class="btn btn-primary" value="Submit">
       </div>

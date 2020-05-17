@@ -9,6 +9,7 @@ import datetime
 import calendar
 import json
 import os
+from settings.models import Setting
 
 
 @login_required(login_url='/authentication/login')
@@ -31,6 +32,7 @@ def income(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
+        'currency': Setting.objects.get(user=request.user).currency.split('-')[0],
         'sources': sources,
         'income': income,
         'page_obj': page_obj,
@@ -41,39 +43,34 @@ def income(request):
 @login_required(login_url='/authentication/login')
 def income_add(request):
     sources = Source.objects.all()
-    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    file_path = os.path.join(file, 'currencies.json')
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-        json_file.close()
-    sources = Source.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
     if request.method == 'GET':
         context = {
-            'currencies': arr,
+            'settings': Setting.objects.get(user=request.user),
             'sources': sources}
         return render(request=request, template_name='income/new.html', context=context)
     context = {
         'values': request.POST,
         'sources': sources,
-        'currencies': arr,
     }
     amount = request.POST['amount']
     description = request.POST['description']
-    currency = request.POST['currency']
 
-    date = request.POST['date']
+    income_date = request.POST['ex_date']
     source = request.POST['source']
+
     if not amount:
         messages.error(request,  'Amount is required')
         return render(request=request, template_name='income/new.html', context=context)
     if not source:
         messages.error(request,  'Income Source is required')
         return render(request=request, template_name='income/new.html', context=context)
+
+    if not date:
+        messages.error(request,  'Date is required')
+        return render(request=request, template_name='income/new.html', context=context)
+
     income = Income.objects.create(
-        amount=amount, description=description, source=source, currency=currency, date=date, owner=request.user)
+        amount=amount, description=description, source=source, date=date, owner=request.user)
 
     if income:
         messages.success(request,  'Income was submitted successfully')
@@ -86,32 +83,18 @@ def income_add(request):
 def income_edit(request, id):
     income = Income.objects.get(pk=id)
     sources = Source.objects.all()
-    data = []
-    arr = []
-    file = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    file_path = os.path.join(file, 'currencies.json')
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-        json_file.close()
-    sources = Source.objects.all()
-    arr = []
-    for key, value in data.items():
-        arr.append({'name': key, 'value': value})
-
     context = {
         'values': request.POST,
         'sources': sources,
         'income': income,
-        'currencies': arr
     }
     if request.method == 'GET':
         return render(request, 'income/edit.html', context)
     amount = request.POST['amount']
     description = request.POST['description']
     source = request.POST['source']
-    currency = request.POST['currency']
     name = request.POST['description']
-
+    date = request.POST['ex_date']
     if not source:
         messages.error(request,  'source is required')
         return render(request, 'income/edit.html', context)
@@ -121,8 +104,8 @@ def income_edit(request, id):
     income.amount = amount
     income.description = name
     income.description = description
-    income.currency = currency
     income.source = source
+    income.income_date = date
     income.save()
     messages.success(request,  'Income updated successfully')
     return redirect('income')
@@ -155,23 +138,24 @@ def income_summary(request):
     this_year_count = 0
 
     for one in all_income:
-        if one.date == today:
+        if one.income_date == today:
             todays_amount += one.amount
             todays_count += 1
 
-        if one.date >= week_ago:
+        if one.income_date >= week_ago:
             this_week_amount += one.amount
             this_week_count += 1
 
-        if one.date >= month_ago:
+        if one.income_date >= month_ago:
             this_month_amount += one.amount
             this_month_count += 1
 
-        if one.date >= year_ago:
+        if one.income_date >= year_ago:
             this_year_amount += one.amount
             this_year_count += 1
 
     context = {
+        'currency': Setting.objects.get(user=request.user).currency.split('-')[0],
         'today': {
             'amount': todays_amount,
             "count": todays_count,
@@ -207,7 +191,7 @@ def income_summary_rest(request):
     def get_amount_for_month(month):
         month_amount = 0
         for one in all_income:
-            month_, year = one.date.month, one.date.year
+            month_, year = one.income_date.month, one.income_date.year
             if month == month_ and year == today_year:
                 month_amount += one.amount
         return month_amount
@@ -220,8 +204,8 @@ def income_summary_rest(request):
     def get_amount_for_day(x, today_day, month, today_year):
         day_amount = 0
         for one in all_income:
-            day_, date_,  month_, year_ = one.date.isoweekday(
-            ), one.date.day, one.date.month, one.date.year
+            day_, date_,  month_, year_ = one.income_date.isoweekday(
+            ), one.income_date.day, one.income_date.month, one.income_date.year
             if x == day_ and month == month_ and year_ == today_year:
                 if not day_ > today_day:
                     day_amount += one.amount
@@ -259,7 +243,7 @@ def last_3months_income_stats(request):
     todays_date = datetime.date.today()
     three_months_ago = datetime.date.today() - datetime.timedelta(days=90)
     income = Income.objects.filter(owner=request.user,
-                                   date__gte=three_months_ago, date__lte=todays_date)
+                                   income_date__gte=three_months_ago, income_date__lte=todays_date)
     # sources occuring.
 
     def get_sources(item):
@@ -288,11 +272,11 @@ def last_3months_income_source_stats(request):
     last_3_month = last_2_month - datetime.timedelta(days=30)
 
     last_month_income = Income.objects.filter(owner=request.user,
-                                              date__gte=last_month, date__lte=todays_date).order_by('date')
+                                              income_date__gte=last_month, income_date__lte=todays_date).order_by('income_date')
     prev_month_income = Income.objects.filter(owner=request.user,
-                                              date__gte=last_month, date__lte=last_2_month)
+                                              income_date__gte=last_month, income_date__lte=last_2_month)
     prev_prev_month_income = Income.objects.filter(owner=request.user,
-                                                   date__gte=last_2_month, date__lte=last_3_month)
+                                                   income_date__gte=last_2_month, income_date__lte=last_3_month)
 
     keyed_data = []
     this_month_data = {'7th': 0, '15th': 0, '22nd': 0, '29th': 0}

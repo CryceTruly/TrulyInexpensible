@@ -26,10 +26,18 @@
           </div>
                <div class="form-group">
                   <label for="exampleFormControlSelect1">Currency</label>
-                  <select class="form-control" name="currency" id="currency">
-                    {% for currency in  currencies%}
+                  <select class="form-control" name="currency" id="currency" {% if settings.currency%}disabled>
+                    <option name="currency"  selected  value={{settings.currency}}>{{settings.currency}}</option>
+
+
+{% else %}
+ {% for currency in  currencies%}
                     <option name="currency"   value={{currency.name}}>{{currency.name}} - {{currency.value}} </option>
                     {% endfor %}
+
+
+                  {% endif %}>
+
                   </select>
            </div>
                 <div class="form-group">
