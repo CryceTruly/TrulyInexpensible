@@ -29,6 +29,7 @@ def search_expenses(request):
 
 @login_required(login_url='/authentication/login')
 def expenses(request):
+
     if not Setting.objects.filter(user=request.user).exists():
         messages.info(request, 'Please choose your preferred currency')
         return redirect('general-settings')
@@ -37,14 +38,9 @@ def expenses(request):
     paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    userprefs = Setting.objects.filter(user=request.user)
-
-    currency = 'Currency Not Set'
-
-    if userprefs.exists():
-        currency = userprefs[0].currency.split('-')[0],
+    currency = Setting.objects.get(user=request.user)
     context = {
-        'currency': currency,
+        'currency': currency.split('-')[0],
         'categories': categories,
         'expenses': expenses,
         'page_obj': page_obj,
