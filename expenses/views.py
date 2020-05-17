@@ -29,6 +29,9 @@ def search_expenses(request):
 
 @login_required(login_url='/authentication/login')
 def expenses(request):
+    if not Setting.objects.filter(user=request.user).exists():
+        messages.info(request, 'Please choose your preferred currency')
+        return redirect('general-settings')
     categories = Category.objects.all()
     expenses = Expense.objects.filter(owner=request.user)
     paginator = Paginator(expenses, 5)
@@ -142,6 +145,10 @@ def expense_delete(request):
 
 @login_required(login_url='/authentication/login')
 def expense_summary(request):
+
+    if not Setting.objects.filter(user=request.user).exists():
+        messages.info(request, 'Please choose your preferred currency')
+        return redirect('general-settings')
     all_expenses = Expense.objects.filter(owner=request.user)
     today = datetime.datetime.today().date()
     today2 = datetime.date.today()

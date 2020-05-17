@@ -125,6 +125,10 @@ def income_delete(request):
 
 @login_required(login_url='/authentication/login')
 def income_summary(request):
+
+    if not Setting.objects.filter(user=request.user).exists():
+        messages.info(request, 'Please choose your preferred currency')
+        return redirect('general-settings')
     all_income = Income.objects.all()
     today = datetime.datetime.today().date()
     today2 = datetime.date.today()
